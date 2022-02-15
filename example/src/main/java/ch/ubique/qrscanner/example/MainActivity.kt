@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	private lateinit var binding: ActivityMainBinding
+	private var isFlashEnabled = false
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -30,6 +31,15 @@ class MainActivity : AppCompatActivity() {
 				is DecodingState.Decoded -> binding.decodingState.text = state.content
 				is DecodingState.Error -> binding.decodingState.text = "Error: ${state.errorCode}"
 			}
+		}
+
+		binding.cameraFlash.setOnClickListener {
+			isFlashEnabled = !isFlashEnabled
+			binding.qrScanner.setFlash(isFlashEnabled)
+		}
+
+		binding.cameraZoom.addOnChangeListener { _, value, _ ->
+			binding.qrScanner.setLinearZoom(value)
 		}
 	}
 
@@ -46,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 		if (requestCode == PERMISSION_REQUEST_CAMERA) {
 			val isGranted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
 			if (isGranted) {
-				binding.qrScanner.onPermissionGranted()
+				binding.qrScanner.activateCamera()
 			}
 		}
 	}

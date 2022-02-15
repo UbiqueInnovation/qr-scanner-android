@@ -1,5 +1,6 @@
 package ch.ubique.qrscanner.zxing.decoder
 
+import android.graphics.Bitmap
 import android.graphics.ImageFormat
 import androidx.camera.core.ImageProxy
 import ch.ubique.qrscanner.scanner.ErrorCodes
@@ -40,20 +41,32 @@ abstract class ZXingImageDecoder(
 				false
 			)
 
-			val binarizer = binarizerFactory.invoke(source)
-			val binaryBitmap = BinaryBitmap(binarizer)
-			return try {
-				val result = reader.decodeWithState(binaryBitmap)
-				DecodingState.Decoded(result.text)
-			} catch (e: NotFoundException) {
-				DecodingState.NotFound
-			} catch (e: ChecksumException) {
-				DecodingState.NotFound
-			} catch (e: FormatException) {
-				DecodingState.NotFound
-			}
+			return decodeLuminanceSource(source)
 		} else {
 			return DecodingState.Error(ErrorCodes.INPUT_WRONG_FORMAT)
+		}
+	}
+
+	override fun decodeBitmap(bitmap: Bitmap): DecodingState {
+		val intArray = IntArray(bitmap.width * bitmap.height)
+		bitmap.getPixels(intArray, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
+		val source = RGBLuminanceSource(bitmap.width, bitmap.height, intArray)
+
+		return decodeLuminanceSource(source)
+	}
+
+	private fun decodeLuminanceSource(source: LuminanceSource): DecodingState {
+		val binarizer = binarizerFactory.invoke(source)
+		val binaryBitmap = BinaryBitmap(binarizer)
+		return try {
+			val result = reader.decodeWithState(binaryBitmap)
+			DecodingState.Decoded(result.text)
+		} catch (e: NotFoundException) {
+			DecodingState.NotFound
+		} catch (e: ChecksumException) {
+			DecodingState.NotFound
+		} catch (e: FormatException) {
+			DecodingState.NotFound
 		}
 	}
 
