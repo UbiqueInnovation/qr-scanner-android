@@ -33,17 +33,13 @@ internal class ImageAnalyzer(
 	override fun analyze(image: ImageProxy) {
 		if (imageDecoders.isEmpty()) return
 
-		when (scanningMode) {
-			ScanningMode.PARALLEL -> {
-				coroutineScope.launch {
-					image.use { decodeFrameInParallel(it) }
+		coroutineScope.launch {
+			image.use {
+				when (scanningMode) {
+					ScanningMode.PARALLEL -> decodeFrameInParallel(it)
+					ScanningMode.SEQUENTIAL -> decodeFrameSequentially(it)
+					ScanningMode.ALTERNATING -> decodeFrameAlternating(it)
 				}
-			}
-			ScanningMode.SEQUENTIAL -> {
-				image.use { decodeFrameSequentially(it) }
-			}
-			ScanningMode.ALTERNATING -> {
-				image.use { decodeFrameAlternating(it) }
 			}
 		}
 	}
@@ -60,9 +56,9 @@ internal class ImageAnalyzer(
 		this.scanningMode = scanningMode
 	}
 
-	private suspend fun decodeFrameInParallel(image: ImageProxy) = withContext(Dispatchers.IO) {
+	private suspend fun decodeFrameInParallel(image: ImageProxy) {
 		val deferredDecodingStates = imageDecoders.map {
-			coroutineScope.async { it.decodeFrame(image) }
+			coroutineScope.async(Dispatchers.IO) { it.decodeFrame(image) }
 		}
 
 		val decodingStates = deferredDecodingStates.awaitAll()
@@ -78,7 +74,7 @@ internal class ImageAnalyzer(
 		}
 	}
 
-	private fun decodeFrameSequentially(image: ImageProxy) {
+	private suspend fun decodeFrameSequentially(image: ImageProxy) {
 		for (decoder in imageDecoders) {
 			val decodingState = decoder.decodeFrame(image)
 			if (decodingState is DecodingState.Decoded || decodingState is DecodingState.Error) {
@@ -90,7 +86,7 @@ internal class ImageAnalyzer(
 		scannerCallback?.onFrameProcessed(DecodingState.NotFound)
 	}
 
-	private fun decodeFrameAlternating(image: ImageProxy) {
+	private suspend fun decodeFrameAlternating(image: ImageProxy) {
 		val decoder = sequentialIterator.next()
 		val decodingState = decoder.decodeFrame(image)
 		scannerCallback?.onFrameProcessed(decodingState)

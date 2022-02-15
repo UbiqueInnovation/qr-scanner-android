@@ -33,7 +33,9 @@ android {
 
 dependencies {
 	api project(':qrscanner-common')
-	api 'com.google.zxing:core:3.4.1'
+
+	// Use bundled mlkit model. See: https://developers.google.com/ml-kit/vision/barcode-scanning/android
+	api 'com.google.mlkit:barcode-scanning:17.0.2'
 
 	implementation 'androidx.core:core-ktx:1.7.0'
 	implementation 'androidx.appcompat:appcompat:1.4.1'

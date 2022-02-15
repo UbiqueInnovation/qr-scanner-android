@@ -8,10 +8,10 @@ interface ImageDecoder {
 	/**
 	 * Decode a frame coming from the camera preview as an [ImageProxy]
 	 */
-	fun decodeFrame(image: ImageProxy): DecodingState
+	suspend fun decodeFrame(image: ImageProxy): DecodingState
 
 	/**
 	 * Decode a bitmap which may come from any source such as a file
 	 */
-	fun decodeBitmap(bitmap: Bitmap): DecodingState
+	suspend fun decodeBitmap(bitmap: Bitmap): DecodingState
 }

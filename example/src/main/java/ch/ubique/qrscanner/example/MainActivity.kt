@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import ch.ubique.qrscanner.example.databinding.ActivityMainBinding
+import ch.ubique.qrscanner.mlkit.decoder.MLKitImageDecoder
 import ch.ubique.qrscanner.state.DecodingState
 import ch.ubique.qrscanner.util.CameraUtil
 import ch.ubique.qrscanner.zxing.decoder.GlobalHistogramImageDecoder
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 		binding = ActivityMainBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 
-		binding.qrScanner.setImageDecoders(GlobalHistogramImageDecoder(), HybridImageDecoder())
+		binding.qrScanner.setImageDecoders(MLKitImageDecoder(), GlobalHistogramImageDecoder(), HybridImageDecoder())
 		binding.qrScanner.setScannerCallback { state ->
 			when (state) {
 				is DecodingState.NotFound -> binding.decodingState.text = "Scanning"

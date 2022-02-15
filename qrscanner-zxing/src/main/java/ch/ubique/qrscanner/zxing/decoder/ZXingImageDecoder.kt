@@ -9,6 +9,8 @@ import ch.ubique.qrscanner.state.DecodingState
 import com.google.zxing.*
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
 
 class GlobalHistogramImageDecoder : ZXingImageDecoder(binarizerFactory = { GlobalHistogramBinarizer(it) })
@@ -27,9 +29,10 @@ abstract class ZXingImageDecoder(
 		setHints(map)
 	}
 
-	override fun decodeFrame(image: ImageProxy): DecodingState {
+	override suspend fun decodeFrame(image: ImageProxy): DecodingState = withContext(Dispatchers.IO) {
 		if (image.format in yuvFormats && image.planes.size == 3) {
-			val data = image.planes[0].buffer.toByteArray()
+			val buffer = image.planes[0].buffer
+			val data = buffer.toByteArray()
 			val source = PlanarYUVLuminanceSource(
 				data,
 				image.planes[0].rowStride,
@@ -41,18 +44,18 @@ abstract class ZXingImageDecoder(
 				false
 			)
 
-			return decodeLuminanceSource(source)
+			return@withContext decodeLuminanceSource(source)
 		} else {
-			return DecodingState.Error(ErrorCodes.INPUT_WRONG_FORMAT)
+			return@withContext DecodingState.Error(ErrorCodes.INPUT_WRONG_FORMAT)
 		}
 	}
 
-	override fun decodeBitmap(bitmap: Bitmap): DecodingState {
+	override suspend fun decodeBitmap(bitmap: Bitmap): DecodingState = withContext(Dispatchers.IO) {
 		val intArray = IntArray(bitmap.width * bitmap.height)
 		bitmap.getPixels(intArray, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
 		val source = RGBLuminanceSource(bitmap.width, bitmap.height, intArray)
 
-		return decodeLuminanceSource(source)
+		return@withContext decodeLuminanceSource(source)
 	}
 
 	private fun decodeLuminanceSource(source: LuminanceSource): DecodingState {

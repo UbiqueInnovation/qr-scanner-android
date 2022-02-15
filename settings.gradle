@@ -16,3 +16,4 @@ rootProject.name = "QR Scanner"
 include ':example'
 include ':qrscanner-common'
 include ':qrscanner-zxing'
+include ':qrscanner-mlkit'
