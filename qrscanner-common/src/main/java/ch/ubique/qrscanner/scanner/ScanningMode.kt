@@ -12,7 +12,7 @@ enum class ScanningMode {
 	SEQUENTIAL,
 
 	/**
-	 * Alternatign scanning mode tries to decode every frame with another image decoder, in the order they were set
+	 * Alternating scanning mode tries to decode every frame with another image decoder, in the order they were set
 	 */
 	ALTERNATING,
 }
