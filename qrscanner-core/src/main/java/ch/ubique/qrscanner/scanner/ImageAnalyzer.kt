@@ -5,7 +5,13 @@ import androidx.camera.core.ImageProxy
 import ch.ubique.qrscanner.state.DecodingState
 import kotlinx.coroutines.*
 
-internal class ImageAnalyzer(
+/**
+ * TODO Unit/Instrumentation tests?
+ * https://github.com/xiandanin/CameraX/blob/master/camera-camera2/src/androidTest/java/androidx/camera/camera2/ImageAnalysisTest.java
+ * https://android.googlesource.com/platform/frameworks/support/+/refs/heads/androidx-main/camera/camera-core/src/test/java/androidx/camera/core/ImageAnalysisTest.java
+ * https://android.googlesource.com/platform/frameworks/support/+/refs/heads/androidx-main/camera/camera-core/src/test/java/androidx/camera/core/ImageAnalysisNonBlockingAnalyzerTest.java
+ */
+class ImageAnalyzer(
 	private val coroutineScope: CoroutineScope,
 ) : ImageAnalysis.Analyzer {
 

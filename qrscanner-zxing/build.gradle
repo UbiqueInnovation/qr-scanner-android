@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-	api project(':qrscanner-common')
+	api project(':qrscanner-core')
 	api 'com.google.zxing:core:3.4.1'
 
 	implementation 'androidx.core:core-ktx:1.7.0'

@@ -1,7 +1,6 @@
 plugins {
 	id 'com.android.library'
 	id 'org.jetbrains.kotlin.android'
-	id 'com.vanniktech.maven.publish' version '0.18.0'
 }
 
 android {
@@ -30,17 +29,29 @@ android {
 	kotlinOptions {
 		jvmTarget = '1.8'
 	}
+
+	buildFeatures {
+		compose true
+	}
+
+	composeOptions {
+		kotlinCompilerExtensionVersion '1.1.0'
+	}
 }
 
 dependencies {
 	api project(':qrscanner-core')
 
-	// Use bundled mlkit model. See: https://developers.google.com/ml-kit/vision/barcode-scanning/android
-	api 'com.google.mlkit:barcode-scanning:17.0.2'
-
 	implementation 'androidx.core:core-ktx:1.7.0'
 	implementation 'androidx.appcompat:appcompat:1.4.1'
-	implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+	implementation 'androidx.fragment:fragment-ktx:1.4.1'
+
+	// Jetpack Compose
+	def compose_version = '1.1.0'
+	implementation "androidx.compose.ui:ui:$compose_version"
+	implementation "androidx.compose.ui:ui-tooling:$compose_version"
+	implementation "androidx.compose.ui:ui-unit:$compose_version"
+	implementation "androidx.compose.material:material:$compose_version"
 
 	testImplementation 'junit:junit:4.13.2'
 	androidTestImplementation 'androidx.test.ext:junit:1.1.3'

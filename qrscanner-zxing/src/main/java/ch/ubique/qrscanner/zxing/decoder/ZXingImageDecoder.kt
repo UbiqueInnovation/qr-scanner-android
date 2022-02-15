@@ -77,6 +77,7 @@ abstract class ZXingImageDecoder(
 		rewind()
 		val data = ByteArray(remaining())
 		get(data)
+		rewind()
 		return data
 	}
 }

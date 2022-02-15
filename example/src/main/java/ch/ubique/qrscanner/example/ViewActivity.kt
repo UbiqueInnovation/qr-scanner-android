@@ -4,15 +4,15 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import ch.ubique.qrscanner.example.databinding.ActivityMainBinding
+import ch.ubique.qrscanner.example.databinding.ActivityViewBinding
 import ch.ubique.qrscanner.mlkit.decoder.MLKitImageDecoder
 import ch.ubique.qrscanner.state.DecodingState
 import ch.ubique.qrscanner.zxing.decoder.GlobalHistogramImageDecoder
 import ch.ubique.qrscanner.zxing.decoder.HybridImageDecoder
 
-class MainActivity : AppCompatActivity() {
+class ViewActivity : AppCompatActivity() {
 
-	private lateinit var binding: ActivityMainBinding
+	private lateinit var binding: ActivityViewBinding
 	private var isFlashEnabled = false
 
 	private val cameraPermisisonLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		binding = ActivityMainBinding.inflate(layoutInflater)
+		binding = ActivityViewBinding.inflate(layoutInflater)
 		setContentView(binding.root)
 
 		binding.qrScanner.setImageDecoders(MLKitImageDecoder(), GlobalHistogramImageDecoder(), HybridImageDecoder())

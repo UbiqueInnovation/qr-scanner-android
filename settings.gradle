@@ -14,6 +14,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "QR Scanner"
 include ':example'
-include ':qrscanner-common'
+include ':qrscanner-core'
 include ':qrscanner-zxing'
 include ':qrscanner-mlkit'
+include ':qrscanner-compose'

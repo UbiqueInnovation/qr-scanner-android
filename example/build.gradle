@@ -34,6 +34,11 @@ android {
 
 	buildFeatures {
 		viewBinding true
+		compose true
+	}
+
+	composeOptions {
+		kotlinCompilerExtensionVersion '1.1.0'
 	}
 }
 
@@ -45,6 +50,15 @@ dependencies {
 
 	implementation project(':qrscanner-zxing')
 	implementation project(':qrscanner-mlkit')
+	implementation project(':qrscanner-compose')
+
+	def compose_version = '1.1.0'
+	implementation "androidx.compose.ui:ui:$compose_version"
+	implementation "androidx.compose.ui:ui-tooling:$compose_version"
+	implementation "androidx.compose.ui:ui-unit:$compose_version"
+	implementation "androidx.compose.foundation:foundation:$compose_version"
+	implementation "androidx.compose.material:material:$compose_version"
+	implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
 	testImplementation 'junit:junit:4.13.2'
 	androidTestImplementation 'androidx.test.ext:junit:1.1.3'
