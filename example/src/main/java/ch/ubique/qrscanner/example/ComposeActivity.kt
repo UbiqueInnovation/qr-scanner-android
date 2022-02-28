@@ -5,7 +5,13 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.Button
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
@@ -16,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ch.ubique.qrscanner.compose.QrScanner
 import ch.ubique.qrscanner.example.databinding.ActivityComposeBinding
+import ch.ubique.qrscanner.mlkit.decoder.MLKitImageDecoder
 import ch.ubique.qrscanner.scanner.QrScannerCallback
 import ch.ubique.qrscanner.state.DecodingState
 import ch.ubique.qrscanner.zxing.decoder.GlobalHistogramImageDecoder
@@ -44,7 +51,7 @@ class ComposeActivity : AppCompatActivity() {
 		binding.composeView.setContent {
 			Box(Modifier.fillMaxSize()) {
 				QrScanner(
-					imageDecoders = listOf(GlobalHistogramImageDecoder(), HybridImageDecoder()),
+					imageDecoders = listOf(MLKitImageDecoder(), GlobalHistogramImageDecoder(), HybridImageDecoder()),
 					scannerCallback = scannerCallback,
 					modifier = Modifier.fillMaxSize(),
 					isFlashEnabled = isFlashEnabled.collectAsState(),
