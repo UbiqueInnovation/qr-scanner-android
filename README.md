@@ -9,14 +9,17 @@ QR Code Scanner for Android built by [Ubique](https://www.ubique.ch) based on An
 This library is available on `mavenCentral()`
 
 ```kotlin
-// A scanner implementation based on ZXing
+// Core library containing the camera view and image analysis use case
+implementation 'ch.ubique.android:qrscanner-core:1.0.0'
+
+// ZXing based image decoders
 implementation 'ch.ubique.android:qrscanner-zxing:1.0.0'
 
-// A scanner implementation based on MLKit
+// MLKit based image decoders
 implementation 'ch.ubique.android:qrscanner-mlkit:1.0.0'
 
 // Jetpack Compose support
-implementation 'ch.ubique.android:qrscanner-support:1.0.0'
+implementation 'ch.ubique.android:qrscanner-compose:1.0.0'
 ```
 
 ## Quick Start
