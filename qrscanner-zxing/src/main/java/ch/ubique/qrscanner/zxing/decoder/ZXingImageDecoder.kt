@@ -6,7 +6,17 @@ import androidx.camera.core.ImageProxy
 import ch.ubique.qrscanner.scanner.ErrorCodes
 import ch.ubique.qrscanner.scanner.ImageDecoder
 import ch.ubique.qrscanner.state.DecodingState
-import com.google.zxing.*
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.Binarizer
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.ChecksumException
+import com.google.zxing.DecodeHintType
+import com.google.zxing.FormatException
+import com.google.zxing.LuminanceSource
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.NotFoundException
+import com.google.zxing.PlanarYUVLuminanceSource
+import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
 import kotlinx.coroutines.Dispatchers
@@ -31,18 +41,22 @@ abstract class ZXingImageDecoder(
 
 	override suspend fun decodeFrame(image: ImageProxy): DecodingState = withContext(Dispatchers.IO) {
 		if (image.format in yuvFormats && image.planes.size == 3) {
-			val buffer = image.planes[0].buffer
-			val data = buffer.toByteArray()
-			val source = PlanarYUVLuminanceSource(
-				data,
-				image.planes[0].rowStride,
-				image.height,
-				0,
-				0,
-				image.width,
-				image.height,
-				false
-			)
+			val source = try {
+				val buffer = image.planes[0].buffer.asReadOnlyBuffer()
+				val data = buffer.toByteArray()
+				PlanarYUVLuminanceSource(
+					data,
+					image.planes[0].rowStride,
+					image.height,
+					0,
+					0,
+					image.width,
+					image.height,
+					false
+				)
+			} catch (e: Exception) {
+				return@withContext DecodingState.Error(ErrorCodes.INPUT_READ_FAILED)
+			}
 
 			return@withContext decodeLuminanceSource(source)
 		} else {
