@@ -115,6 +115,11 @@ class QrScannerView @JvmOverloads constructor(
 				.requireLensFacing(CameraSelector.LENS_FACING_BACK)
 				.build()
 
+			// Since the CameraProvider is a singleton and will return the same instance across multiple invocations, any other view
+			// that has binded to that camera provider without unbinding will cause this view to throw an exception when trying to bind to the lifecycle.
+			// This might happen e.g. if the camera view is used within a RecyclerView and an old view holder has not finished
+			// calling deactivateCamera() before the new view holder already calls activateCamera()
+			cameraProvider.unbindAll()
 			camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis)
 			isCameraActive = true
 		}, mainExecutor)
