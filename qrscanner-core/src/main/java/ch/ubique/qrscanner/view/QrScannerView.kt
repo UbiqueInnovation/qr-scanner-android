@@ -19,10 +19,7 @@ import androidx.core.view.GestureDetectorCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import ch.ubique.qrscanner.scanner.ImageAnalyzer
-import ch.ubique.qrscanner.scanner.ImageDecoder
-import ch.ubique.qrscanner.scanner.QrScannerCallback
-import ch.ubique.qrscanner.scanner.ScanningMode
+import ch.ubique.qrscanner.scanner.*
 import ch.ubique.qrscanner.util.CameraUtil
 
 class QrScannerView @JvmOverloads constructor(
@@ -57,12 +54,16 @@ class QrScannerView @JvmOverloads constructor(
 	})
 
 	private var rotation = Surface.ROTATION_0
-	private var isCameraActive = false
 	private var isFocusOnTapEnabled = true
+	private var autoActivateOnAttach = true
 
 	private var imageDecoders: List<ImageDecoder> = emptyList()
 	private var scannerCallback: QrScannerCallback? = null
 	private var scanningMode = ScanningMode.PARALLEL
+	private var cameraStateCallback: CameraStateCallback? = null
+
+	var isCameraActive = false
+		private set
 
 	init {
 		addView(previewView)
@@ -88,7 +89,7 @@ class QrScannerView @JvmOverloads constructor(
 		initializePreview()
 		initializeAnalysis()
 
-		if (CameraUtil.hasCameraPermission(context)) {
+		if (CameraUtil.hasCameraPermission(context) && autoActivateOnAttach) {
 			activateCamera()
 		}
 	}
@@ -116,7 +117,7 @@ class QrScannerView @JvmOverloads constructor(
 				.build()
 
 			camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis)
-			isCameraActive = true
+			setCameraState(true)
 		}, mainExecutor)
 	}
 
@@ -129,8 +130,24 @@ class QrScannerView @JvmOverloads constructor(
 		cameraProviderFuture.addListener({
 			val cameraProvider = cameraProviderFuture.get()
 			cameraProvider.unbindAll()
-			isCameraActive = false
+			setCameraState(false)
 		}, mainExecutor)
+	}
+
+	/**
+	 * Add an option to disable the automatic camera activation when the view is attached to the window.
+	 * This might be desirable if the client wants to control the (de-)activation of the camera preview themselves
+	 */
+	fun setAutoActivateOnAttach(autoActivateOnAttach: Boolean) {
+		this.autoActivateOnAttach = autoActivateOnAttach
+	}
+
+	/**
+	 * Set a callback for when the camera state changes due to calls to [activateCamera] and [deactivateCamera]
+	 */
+	fun setCameraStateCallback(callback: CameraStateCallback) {
+		this.cameraStateCallback = callback
+		callback.onCameraStateChanged(isCameraActive)
 	}
 
 	/**
@@ -183,6 +200,24 @@ class QrScannerView @JvmOverloads constructor(
 		}
 	}
 
+	/**
+	 * Start a focus and metering action for the given focus point. This is intended for regular autofocus intervals.
+	 * If you need tap to focus behavior, use [setFocusOnTap] instead.
+	 */
+	fun startAutofocus(focusPointX: Float, focusPointY: Float) {
+		if (isCameraActive) {
+			val metricPointFactory = previewView.meteringPointFactory
+			val point = metricPointFactory.createPoint(focusPointX, focusPointY)
+			val action = FocusMeteringAction.Builder(point).build()
+			camera?.cameraControl?.startFocusAndMetering(action)
+		}
+	}
+
+	/**
+	 * @return The active camera's info or null if it is not yet initialized
+	 */
+	fun getCameraInfo() = camera?.cameraInfo
+
 	private fun initializePreview() {
 		preview = Preview.Builder()
 			.setTargetResolution(Size(720, 1280))
@@ -207,13 +242,9 @@ class QrScannerView @JvmOverloads constructor(
 			.apply { setAnalyzer(mainExecutor, analyzer) }
 	}
 
-	private fun startAutofocus(focusPointX: Float, focusPointY: Float) {
-		if (isCameraActive) {
-			val metricPointFactory = previewView.meteringPointFactory
-			val point = metricPointFactory.createPoint(focusPointX, focusPointY)
-			val action = FocusMeteringAction.Builder(point).build()
-			camera?.cameraControl?.startFocusAndMetering(action)
-		}
+	private fun setCameraState(isActive: Boolean) {
+		this.isCameraActive = isActive
+		cameraStateCallback?.onCameraStateChanged(isActive)
 	}
 
 }
