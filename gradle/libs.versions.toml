@@ -1,0 +1,52 @@
+[versions]
+agp = "8.7.0"
+androidx-camera = "1.3.4"
+androidx-core = "1.13.1"
+androidx-fragment = "1.8.4"
+androidx-test-ext-junit = "1.2.1"
+compose = "2024.09.03"
+constraintlayout = "2.1.4"
+espresso-core = "3.6.1"
+junit = "4.13.2"
+kotlin = "2.0.20"
+kotlinx-coroutines = "1.9.0"
+material = "1.12.0"
+maven-publish = "0.27.0"
+mlkit = "17.3.0"
+ubique-alpaka = "8.7.0"
+ubique-preset = "8.7.0"
+zxing = "3.5.3"
+
+[bundles]
+
+[libraries]
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "androidx-camera" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "androidx-camera" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "androidx-camera" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-fragmentKtx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
+compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-unit = { group = "androidx.compose.ui", name = "ui-unit" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+compose-material = { group = "androidx.compose.material", name = "material" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+mlkit-barcode = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+ubique-alpaka = { id = "ch.ubique.gradle.alpaka", version.ref = "ubique-alpaka" }
+ubique-preset = { id = "ch.ubique.gradle.preset", version.ref = "ubique-preset" }
+
+

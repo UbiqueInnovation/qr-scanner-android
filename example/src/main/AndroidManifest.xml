@@ -23,7 +23,7 @@
 		android:theme="@style/Theme.QRScanner">
 		<activity
 			android:name=".ViewActivity"
-			android:label="XML"
+			android:label="UB Scanner XML"
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -33,7 +33,7 @@
 		</activity>
 		<activity
 			android:name=".ComposeActivity"
-			android:label="Compose"
+			android:label="UB Scanner Compose"
 			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />

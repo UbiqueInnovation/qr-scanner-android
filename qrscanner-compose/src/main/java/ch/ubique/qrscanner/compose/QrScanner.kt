@@ -1,21 +1,23 @@
 package ch.ubique.qrscanner.compose
 
-import android.util.Size
 import android.view.Display
 import android.view.Surface
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.hardware.display.DisplayManagerCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import ch.ubique.qrscanner.scanner.ImageAnalyzer
 import ch.ubique.qrscanner.scanner.ImageDecoder
@@ -31,7 +33,7 @@ fun QrScanner(
 	modifier: Modifier = Modifier,
 	scanningMode: ScanningMode = ScanningMode.PARALLEL,
 	isFlashEnabled: State<Boolean> = remember { mutableStateOf(false) },
-	linearZoom: State<Float> = remember { mutableStateOf(0f) },
+	linearZoom: State<Float> = remember { mutableFloatStateOf(0f) },
 ) {
 	val context = LocalContext.current
 	val lifecycleOwner = LocalLifecycleOwner.current
@@ -40,7 +42,12 @@ fun QrScanner(
 	val rotation = DisplayManagerCompat.getInstance(context).getDisplay(Display.DEFAULT_DISPLAY)?.rotation ?: Surface.ROTATION_0
 
 	val preview = Preview.Builder()
-		.setTargetResolution(Size(720, 1280))
+		.setResolutionSelector(
+			ResolutionSelector.Builder()
+				.setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
+				.setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+				.build()
+		)
 		.setTargetRotation(rotation)
 		.build()
 
@@ -49,7 +56,12 @@ fun QrScanner(
 		.build()
 
 	val imageAnalysis = ImageAnalysis.Builder()
-		.setTargetResolution(Size(720, 1280))
+		.setResolutionSelector(
+			ResolutionSelector.Builder()
+				.setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
+				.setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+				.build()
+		)
 		.setTargetRotation(rotation)
 		.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
 		.build()
