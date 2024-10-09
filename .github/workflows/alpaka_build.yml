@@ -20,10 +20,8 @@ jobs:
       concurrencyGroup: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.flavor }}
       runs-on: '["ubuntu-latest"]'
     secrets:
-      ANDROID_JENKINS_PAT: ${{ secrets.ANDROID_JENKINS_PAT }}
+      ANDROID_JENKINS_PAT: ${{ secrets.GITHUB_TOKEN }}
       UB_ARTIFACTORY_URL_ANDROID: ${{ secrets.UB_ARTIFACTORY_URL_ANDROID }}
       UB_ARTIFACTORY_USER: ${{ secrets.UB_ARTIFACTORY_USER }}
       UB_ARTIFACTORY_PASSWORD: ${{ secrets.UB_ARTIFACTORY_PASSWORD }}
       ALPAKA_UPLOAD_KEY: ${{ secrets.ALPAKA_UPLOAD_KEY }}
-      self_hosted_cache_access_key: ${{ secrets.self_hosted_cache_access_key }}
-      self_hosted_cache_secret_key: ${{ secrets.self_hosted_cache_secret_key }}
