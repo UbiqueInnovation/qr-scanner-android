@@ -25,3 +25,4 @@ jobs:
       UB_ARTIFACTORY_USER: ${{ secrets.UB_ARTIFACTORY_USER }}
       UB_ARTIFACTORY_PASSWORD: ${{ secrets.UB_ARTIFACTORY_PASSWORD }}
       ALPAKA_UPLOAD_KEY: ${{ secrets.ALPAKA_UPLOAD_KEY }}
+      ADDITIONAL_GRADLE_PROPS: "-PstorePassword=${{ secrets.KEYSTORE_PASSWORD }} -PkeyAlias=${{ secrets.KEY_ALIAS }} -PkeyPassword=${{ secrets.KEY_PASSWORD }}"

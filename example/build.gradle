@@ -1,3 +1,5 @@
+import ch.ubique.gradle.preset.utils.PropertyUtilsKt
+
 plugins {
 	alias libs.plugins.android.application
 	alias libs.plugins.kotlinAndroid
@@ -31,9 +33,9 @@ android {
 	signingConfigs {
 		ubique {
 			storeFile file("keystore.jks")
-			storePassword System.getenv("KEYSTORE_PASSWORD")
-			keyAlias System.getenv("KEY_ALIAS")
-			keyPassword System.getenv("KEY_PASSWORD")
+			storePassword System.getenv("KEYSTORE_PASSWORD") ?: PropertyUtilsKt.readProperty(project, "storePassword")
+			keyAlias System.getenv("KEY_ALIAS") ?: PropertyUtilsKt.readProperty(project, "keyAlias")
+			keyPassword System.getenv("KEY_PASSWORD") ?: PropertyUtilsKt.readProperty(project, "keyPassword")
 		}
 	}
 
