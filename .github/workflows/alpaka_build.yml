@@ -13,11 +13,12 @@ jobs:
       max-parallel: 4
       matrix:
         flavor: [ 'prod' ]
-    uses: UbiqueInnovation/actions-android/.github/workflows/android_build_alpaka_upload.yml@v1.6.5
+    uses: UbiqueInnovation/actions-android/.github/workflows/android_build_alpaka_upload.yml@v1.6.6
     with:
       flavor: '${{ matrix.flavor }}'
       appModule: 'example'
       concurrencyGroup: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.flavor }}
+      runs-on: '["ubuntu-latest"]'
     secrets:
       ANDROID_JENKINS_PAT: ${{ secrets.ANDROID_JENKINS_PAT }}
       UB_ARTIFACTORY_URL_ANDROID: ${{ secrets.UB_ARTIFACTORY_URL_ANDROID }}
