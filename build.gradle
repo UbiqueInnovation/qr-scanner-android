@@ -11,3 +11,12 @@ plugins {
 task clean(type: Delete) {
 	delete rootProject.buildDir
 }
+
+allprojects {
+	// https://github.com/Kotlin/dokka/issues/2956
+	tasks.matching { task ->
+		task.name.contains("javaDocReleaseGeneration")
+	}.configureEach {
+		enabled = false
+	}
+}
