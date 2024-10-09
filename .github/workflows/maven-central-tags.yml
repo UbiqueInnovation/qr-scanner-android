@@ -36,4 +36,4 @@ jobs:
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
-        run: ./gradlew closeAndReleaseRepository -PmavenCentralUsername=$OSSRH_USERNAME -PmavenCentralPassword=$OSSRH_PASSWORD
+        run: ./gradlew releaseRepository -PmavenCentralUsername=$OSSRH_USERNAME -PmavenCentralPassword=$OSSRH_PASSWORD

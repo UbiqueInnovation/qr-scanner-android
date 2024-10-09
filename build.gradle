@@ -13,10 +13,34 @@ task clean(type: Delete) {
 }
 
 allprojects {
+	group = property("GROUP").toString()
+	version = getProjectVersion()
+
+	plugins.withId("com.vanniktech.maven.publish") {
+		mavenPublishing {
+			pom {
+				group = project.group
+				version = project.version
+			}
+		}
+	}
+
+
 	// https://github.com/Kotlin/dokka/issues/2956
 	tasks.matching { task ->
 		task.name.contains("javaDocReleaseGeneration")
 	}.configureEach {
 		enabled = false
 	}
+}
+
+private String getProjectVersion() {
+	def versionFromGradleProperties = property("VERSION").toString()
+	def versionFromWorkflow = null
+	try {
+		versionFromWorkflow = property("githubRefName").toString().replaceFirst("^v", "")
+	} catch (MissingPropertyException ignored) {
+		// Ignore exception and continue
+	}
+	return versionFromWorkflow ?: versionFromGradleProperties
 }
