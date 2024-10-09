@@ -11,6 +11,10 @@ import android.view.Surface
 import android.widget.FrameLayout
 import androidx.annotation.FloatRange
 import androidx.camera.core.*
+import androidx.camera.core.impl.utils.ResolutionSelectorUtil
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -70,7 +74,7 @@ class QrScannerView @JvmOverloads constructor(
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
-	override fun onTouchEvent(event: MotionEvent?): Boolean {
+	override fun onTouchEvent(event: MotionEvent): Boolean {
 		return if (tapToFocusDetector.onTouchEvent(event)) {
 			true
 		} else {
@@ -225,7 +229,12 @@ class QrScannerView @JvmOverloads constructor(
 
 	private fun initializePreview() {
 		preview = Preview.Builder()
-			.setTargetResolution(Size(720, 1280))
+			.setResolutionSelector(
+				ResolutionSelector.Builder()
+					.setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
+					.setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+					.build()
+			)
 			.setTargetRotation(rotation)
 			.build()
 			.apply { setSurfaceProvider(previewView.surfaceProvider) }
@@ -240,7 +249,12 @@ class QrScannerView @JvmOverloads constructor(
 		this.imageAnalyzer = analyzer
 
 		imageAnalysis = ImageAnalysis.Builder()
-			.setTargetResolution(Size(720, 1280))
+			.setResolutionSelector(
+				ResolutionSelector.Builder()
+					.setResolutionStrategy(ResolutionStrategy.HIGHEST_AVAILABLE_STRATEGY)
+					.setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+					.build()
+			)
 			.setTargetRotation(rotation)
 			.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
 			.build()

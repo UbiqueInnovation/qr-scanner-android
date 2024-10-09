@@ -1,0 +1,28 @@
+name: Build and upload to Alpaka
+
+on: [ push, workflow_dispatch ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        flavor: [ 'prod' ]
+    uses: UbiqueInnovation/actions-android/.github/workflows/android_build_alpaka_upload.yml@v1.6.6
+    with:
+      flavor: '${{ matrix.flavor }}'
+      appModule: 'example'
+      concurrencyGroup: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.flavor }}
+      runs-on: '["ubuntu-latest"]'
+    secrets:
+      ANDROID_JENKINS_PAT: ${{ secrets.GITHUB_TOKEN }}
+      UB_ARTIFACTORY_URL_ANDROID: ${{ secrets.UB_ARTIFACTORY_URL_ANDROID }}
+      UB_ARTIFACTORY_USER: ${{ secrets.UB_ARTIFACTORY_USER }}
+      UB_ARTIFACTORY_PASSWORD: ${{ secrets.UB_ARTIFACTORY_PASSWORD }}
+      ALPAKA_UPLOAD_KEY: ${{ secrets.ALPAKA_UPLOAD_KEY }}
+      ADDITIONAL_GRADLE_PROPS: "-PstorePassword=${{ secrets.KEYSTORE_PASSWORD }} -PkeyAlias=${{ secrets.KEY_ALIAS }} -PkeyPassword=${{ secrets.KEY_PASSWORD }}"
