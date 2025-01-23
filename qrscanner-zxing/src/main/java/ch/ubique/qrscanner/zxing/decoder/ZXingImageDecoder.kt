@@ -3,41 +3,35 @@ package ch.ubique.qrscanner.zxing.decoder
 import android.graphics.Bitmap
 import android.graphics.ImageFormat
 import androidx.camera.core.ImageProxy
+import ch.ubique.qrscanner.scanner.BarcodeFormat
 import ch.ubique.qrscanner.scanner.ErrorCodes
 import ch.ubique.qrscanner.scanner.ImageDecoder
 import ch.ubique.qrscanner.state.DecodingState
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.Binarizer
-import com.google.zxing.BinaryBitmap
-import com.google.zxing.ChecksumException
-import com.google.zxing.DecodeHintType
-import com.google.zxing.FormatException
-import com.google.zxing.LuminanceSource
-import com.google.zxing.MultiFormatReader
-import com.google.zxing.NotFoundException
-import com.google.zxing.PlanarYUVLuminanceSource
-import com.google.zxing.RGBLuminanceSource
+import ch.ubique.qrscanner.zxing.extensions.toUbiqueFormat
+import ch.ubique.qrscanner.zxing.scanner.BarcodeScannerUtils
+import com.google.zxing.*
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
 
-class GlobalHistogramImageDecoder : ZXingImageDecoder(binarizerFactory = { GlobalHistogramBinarizer(it) })
-class HybridImageDecoder : ZXingImageDecoder(binarizerFactory = { HybridBinarizer(it) })
+class GlobalHistogramImageDecoder(
+	barcodeFormats: List<BarcodeFormat>,
+) : ZXingImageDecoder(barcodeFormats, binarizerFactory = { GlobalHistogramBinarizer(it) })
+
+class HybridImageDecoder(
+	barcodeFormats: List<BarcodeFormat>,
+) : ZXingImageDecoder(barcodeFormats, binarizerFactory = { HybridBinarizer(it) })
 
 abstract class ZXingImageDecoder(
+	barcodeFormats: List<BarcodeFormat>,
 	private val binarizerFactory: (source: LuminanceSource) -> Binarizer
 ) : ImageDecoder {
 
 	private val yuvFormats = listOf(ImageFormat.YUV_420_888, ImageFormat.YUV_422_888, ImageFormat.YUV_444_888)
-	private val reader = MultiFormatReader().apply {
-		val map = mapOf(
-			DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE),
-			DecodeHintType.TRY_HARDER to true,
-		)
-		setHints(map)
-	}
+	private val decodingHints = mapOf(DecodeHintType.TRY_HARDER to true)
+	private val reader = BarcodeScannerUtils.createBarcodeReader(barcodeFormats, decodingHints)
 
 	override suspend fun decodeFrame(image: ImageProxy): DecodingState = withContext(Dispatchers.IO) {
 		if (image.format in yuvFormats && image.planes.size == 3) {
@@ -77,7 +71,13 @@ abstract class ZXingImageDecoder(
 		val binaryBitmap = BinaryBitmap(binarizer)
 		return try {
 			val result = reader.decodeWithState(binaryBitmap)
-			DecodingState.Decoded(result.text)
+			val format = result.barcodeFormat.toUbiqueFormat()
+
+			if (format != null) {
+				DecodingState.Decoded(result.text, format)
+			} else {
+				DecodingState.NotFound
+			}
 		} catch (e: NotFoundException) {
 			DecodingState.NotFound
 		} catch (e: ChecksumException) {
