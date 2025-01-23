@@ -10,16 +10,16 @@ This library is available on `mavenCentral()`
 
 ```kotlin
 // Core library containing the camera view and image analysis use case
-implementation 'ch.ubique.android:qrscanner-core:1.0.0'
+implementation 'ch.ubique.android:qrscanner-core:1.1.0'
 
 // ZXing based image decoders
-implementation 'ch.ubique.android:qrscanner-zxing:1.0.0'
+implementation 'ch.ubique.android:qrscanner-zxing:1.1.0'
 
 // MLKit based image decoders
-implementation 'ch.ubique.android:qrscanner-mlkit:1.0.0'
+implementation 'ch.ubique.android:qrscanner-mlkit:1.1.0'
 
 // Jetpack Compose support
-implementation 'ch.ubique.android:qrscanner-compose:1.0.0'
+implementation 'ch.ubique.android:qrscanner-compose:1.1.0'
 ```
 
 ## Quick Start
@@ -39,10 +39,11 @@ Include the view in your layout:
 
 Define the image decoders to be used to scan for QR codes:
 ```kotlin
+val formats = listOf(BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128)
 qrScanner.setImageDecoders(
-    MLKitImageDecoder(),            // Available with the qrscanner-mlkit dependency
-	GlobalHistogramImageDecoder(),  // Available with the qrscanner-zxing dependency
-    HybridImageDecoder(),           // Available with the qrscanner-zxing dependency
+    MLKitImageDecoder(formats),            // Available with the qrscanner-mlkit dependency
+	GlobalHistogramImageDecoder(formats),  // Available with the qrscanner-zxing dependency
+    HybridImageDecoder(formats),           // Available with the qrscanner-zxing dependency
 )
 ```
 
@@ -69,11 +70,12 @@ qrScanner.setScanningMode(ScanningMode.PARALLEL) // Change the scanning behavior
 
 Invoke the composable in your screen:
 ```kotlin
+val formats = listOf(BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128)
 QrScanner(
     imageDecoders = listOf(
-		MLKitImageDecoder(),            // Available with the qrscanner-mlkit dependency
-		GlobalHistogramImageDecoder(),  // Available with the qrscanner-zxing dependency
-		HybridImageDecoder(),           // Available with the qrscanner-zxing dependency
+		MLKitImageDecoder(formats),            // Available with the qrscanner-mlkit dependency
+		GlobalHistogramImageDecoder(formats),  // Available with the qrscanner-zxing dependency
+		HybridImageDecoder(formats),           // Available with the qrscanner-zxing dependency
     ),
     scannerCallback = QrScannerCallback { state ->
 		when (state) {
