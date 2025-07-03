@@ -18,6 +18,8 @@ allprojects {
 
 	plugins.withId("com.vanniktech.maven.publish") {
 		mavenPublishing {
+			publishToMavenCentral(true)
+
 			pom {
 				group = project.group
 				version = project.version
