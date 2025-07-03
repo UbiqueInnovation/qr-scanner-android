@@ -6,11 +6,10 @@ plugins {
 
 android {
 	namespace "ch.ubique.qrscanner.mlkit"
-	compileSdk 34
+	compileSdk libs.versions.android.compileSdk.get().toInteger()
 
 	defaultConfig {
-		minSdk 23
-		targetSdk 34
+		minSdk libs.versions.android.minSdk.get().toInteger()
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 		consumerProguardFiles "consumer-rules.pro"

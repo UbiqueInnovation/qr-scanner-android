@@ -25,7 +25,7 @@
 		<activity
 			android:name=".ComposeActivity"
 			android:exported="true"
-			android:label="UB Scanner Compose">
+			android:label="QR Compose">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 
@@ -36,7 +36,7 @@
 		<activity
 			android:name=".ViewActivity"
 			android:exported="true"
-			android:label="UB Scanner XML">
+			android:label="QR XML">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 

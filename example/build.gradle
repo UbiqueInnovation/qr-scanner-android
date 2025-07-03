@@ -10,12 +10,13 @@ plugins {
 
 android {
 	namespace "ch.ubique.qrscanner.example"
-	compileSdk 35
+	compileSdk libs.versions.android.compileSdk.get().toInteger()
 
 	defaultConfig {
 		applicationId "ch.ubique.qrscanner.example"
-		minSdk 23
-		targetSdk 35
+		minSdk libs.versions.android.minSdk.get().toInteger()
+		targetSdk libs.versions.android.targetSdk.get().toInteger()
+
 		versionCode project.version.toString().split('-')[0].replace(".", "").toInteger()
 		versionName project.version.toString()
 
