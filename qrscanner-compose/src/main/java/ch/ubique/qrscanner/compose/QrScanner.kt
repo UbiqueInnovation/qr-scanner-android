@@ -20,10 +20,12 @@ import androidx.core.hardware.display.DisplayManagerCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import ch.ubique.qrscanner.scanner.ImageAnalyzer
+import ch.ubique.qrscanner.scanner.CameraErrorCallback
 import ch.ubique.qrscanner.scanner.ImageDecoder
 import ch.ubique.qrscanner.scanner.QrScannerCallback
 import ch.ubique.qrscanner.scanner.ScanningMode
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 @Composable
@@ -34,6 +36,7 @@ fun QrScanner(
 	scanningMode: ScanningMode = ScanningMode.PARALLEL,
 	isFlashEnabled: State<Boolean> = remember { mutableStateOf(false) },
 	linearZoom: State<Float> = remember { mutableFloatStateOf(0f) },
+	cameraErrorCallback: CameraErrorCallback? = null,
 ) {
 	val context = LocalContext.current
 	val lifecycleOwner = LocalLifecycleOwner.current
@@ -76,15 +79,25 @@ fun QrScanner(
 	val previewView = remember { PreviewView(context) }
 
 	LaunchedEffect(previewView) {
-		val cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
-			val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-			cameraProviderFuture.addListener({
-				continuation.resume(cameraProviderFuture.get())
-			}, mainExecutor)
+		try {
+			val cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
+				val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+				cameraProviderFuture.addListener({
+					runCatching {
+						cameraProviderFuture.get()
+					}.onSuccess(continuation::resume)
+						.onFailure { exception ->
+							continuation.resumeWithException(exception.cause ?: exception)
+						}
+				}, mainExecutor)
+			}
+			cameraProvider.unbindAll()
+			camera.value = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis)
+			preview.setSurfaceProvider(previewView.surfaceProvider)
+		} catch (throwable: Throwable) {
+			camera.value = null
+			cameraErrorCallback?.onCameraError(throwable)
 		}
-		cameraProvider.unbindAll()
-		camera.value = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis)
-		preview.setSurfaceProvider(previewView.surfaceProvider)
 	}
 
 	LaunchedEffect(isFlashEnabled.value) {

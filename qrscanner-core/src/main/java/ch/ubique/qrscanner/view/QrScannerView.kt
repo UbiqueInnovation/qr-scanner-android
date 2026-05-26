@@ -65,6 +65,7 @@ class QrScannerView @JvmOverloads constructor(
 	private var scannerCallback: QrScannerCallback? = null
 	private var scanningMode = ScanningMode.PARALLEL
 	private var cameraStateCallback: CameraStateCallback? = null
+	private var cameraErrorCallback: CameraErrorCallback? = null
 
 	var isCameraActive = false
 		private set
@@ -114,19 +115,21 @@ class QrScannerView @JvmOverloads constructor(
 
 		val lifecycleOwner = viewTreeLifecycleOwner ?: return
 		cameraProviderFuture.addListener({
-			val cameraProvider = cameraProviderFuture.get()
+			runCatching {
+				val cameraProvider = cameraProviderFuture.get()
 
-			val cameraSelector = CameraSelector.Builder()
-				.requireLensFacing(CameraSelector.LENS_FACING_BACK)
-				.build()
+				val cameraSelector = CameraSelector.Builder()
+					.requireLensFacing(CameraSelector.LENS_FACING_BACK)
+					.build()
 
-			// Since the CameraProvider is a singleton and will return the same instance across multiple invocations, any other view
-			// that has binded to that camera provider without unbinding will cause this view to throw an exception when trying to bind to the lifecycle.
-			// This might happen e.g. if the camera view is used within a RecyclerView and an old view holder has not finished
-			// calling deactivateCamera() before the new view holder already calls activateCamera()
-			cameraProvider.unbindAll()
-			camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis)
-			setCameraState(true)
+				// Since the CameraProvider is a singleton and will return the same instance across multiple invocations, any other view
+				// that has binded to that camera provider without unbinding will cause this view to throw an exception when trying to bind to the lifecycle.
+				// This might happen e.g. if the camera view is used within a RecyclerView and an old view holder has not finished
+				// calling deactivateCamera() before the new view holder already calls activateCamera()
+				cameraProvider.unbindAll()
+				camera = cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageAnalysis)
+				setCameraState(true)
+			}.onFailure(::handleCameraError)
 		}, mainExecutor)
 	}
 
@@ -137,9 +140,11 @@ class QrScannerView @JvmOverloads constructor(
 		if (!isCameraActive) return
 
 		cameraProviderFuture.addListener({
-			val cameraProvider = cameraProviderFuture.get()
-			cameraProvider.unbindAll()
-			setCameraState(false)
+			runCatching {
+				val cameraProvider = cameraProviderFuture.get()
+				cameraProvider.unbindAll()
+				setCameraState(false)
+			}.onFailure(::handleCameraError)
 		}, mainExecutor)
 	}
 
@@ -157,6 +162,13 @@ class QrScannerView @JvmOverloads constructor(
 	fun setCameraStateCallback(callback: CameraStateCallback) {
 		this.cameraStateCallback = callback
 		callback.onCameraStateChanged(isCameraActive)
+	}
+
+	/**
+	 * Set a callback to be notified when camera initialization or binding fails.
+	 */
+	fun setCameraErrorCallback(callback: CameraErrorCallback?) {
+		this.cameraErrorCallback = callback
 	}
 
 	/**
@@ -264,6 +276,12 @@ class QrScannerView @JvmOverloads constructor(
 	private fun setCameraState(isActive: Boolean) {
 		this.isCameraActive = isActive
 		cameraStateCallback?.onCameraStateChanged(isActive)
+	}
+
+	private fun handleCameraError(throwable: Throwable) {
+		camera = null
+		setCameraState(false)
+		cameraErrorCallback?.onCameraError(throwable.cause ?: throwable)
 	}
 
 }
