@@ -10,16 +10,16 @@ This library is available on `mavenCentral()`
 
 ```kotlin
 // Core library containing the camera view and image analysis use case
-implementation 'ch.ubique.android:qrscanner-core:1.1.0'
+implementation 'ch.ubique.android:qrscanner-core:1.1.2'
 
 // ZXing based image decoders
-implementation 'ch.ubique.android:qrscanner-zxing:1.1.0'
+implementation 'ch.ubique.android:qrscanner-zxing:1.1.2'
 
 // MLKit based image decoders
-implementation 'ch.ubique.android:qrscanner-mlkit:1.1.0'
+implementation 'ch.ubique.android:qrscanner-mlkit:1.1.2'
 
 // Jetpack Compose support
-implementation 'ch.ubique.android:qrscanner-compose:1.1.0'
+implementation 'ch.ubique.android:qrscanner-compose:1.1.2'
 ```
 
 ## Quick Start
@@ -64,6 +64,9 @@ qrScanner.setFlash(false) // Activate/Deactivate the camera flash
 qrScanner.setLinearZoom(0f) // Set the camera zoom on a linear scale from 0f to 1f
 qrScanner.setFocusOnTap(true) // Enable/disable camera focus on tap
 qrScanner.setScanningMode(ScanningMode.PARALLEL) // Change the scanning behavior when using multiple image decoders
+qrScanner.setCameraErrorCallback { throwable ->
+    // Called when camera initialization or binding fails
+}
 ```
 
 ### Jetpack Compose
@@ -88,6 +91,9 @@ QrScanner(
     scanningMode = ScanningMode.PARALLEL,
     isFlashEnabled = remember { mutableStateOf(false) },
     linearZoom = remember { mutableStateOf(0f) },
+    cameraErrorCallback = CameraErrorCallback { throwable ->
+        // Called when camera initialization or binding fails
+    },
 )
 ```
 
