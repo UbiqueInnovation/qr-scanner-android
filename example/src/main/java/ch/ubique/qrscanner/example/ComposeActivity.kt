@@ -5,24 +5,11 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import ch.ubique.qrscanner.compose.QrScanner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ch.ubique.qrscanner.example.compose.ComposeScannerScreen
 import ch.ubique.qrscanner.example.databinding.ActivityComposeBinding
-import ch.ubique.qrscanner.mlkit.decoder.MLKitImageDecoder
-import ch.ubique.qrscanner.scanner.BarcodeFormat
 import ch.ubique.qrscanner.scanner.QrScannerCallback
 import ch.ubique.qrscanner.state.DecodingState
-import ch.ubique.qrscanner.zxing.decoder.GlobalHistogramImageDecoder
-import ch.ubique.qrscanner.zxing.decoder.HybridImageDecoder
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class ComposeActivity : AppCompatActivity() {
@@ -46,65 +33,14 @@ class ComposeActivity : AppCompatActivity() {
 		setContentView(binding.root)
 
 		binding.composeView.setContent {
-			Box(Modifier.fillMaxSize()) {
-				val formats = listOf(BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128)
-
-				QrScanner(
-					imageDecoders = listOf(
-						MLKitImageDecoder(formats),
-						GlobalHistogramImageDecoder(formats),
-						HybridImageDecoder(formats)
-					),
-					scannerCallback = scannerCallback,
-					modifier = Modifier.fillMaxSize(),
-					isFlashEnabled = isFlashEnabled.collectAsState(),
-					linearZoom = zoomRatio.collectAsState(),
-				)
-
-				Column(
-					modifier = Modifier
-						.fillMaxWidth()
-						.align(Alignment.BottomCenter)
-						.navigationBarsPadding()
-						.consumeWindowInsets(WindowInsets.navigationBars)
-				) {
-					val decodingState = decodingState.collectAsState()
-					val text = when (val state = decodingState.value) {
-						is DecodingState.NotFound -> "Scanning"
-						is DecodingState.Decoded -> state.content
-						is DecodingState.Error -> "Error: ${state.errorCode}"
-					}
-
-					Text(
-						text,
-						modifier = Modifier
-							.padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
-							.fillMaxWidth()
-							.background(Color(0x80000000))
-							.padding(10.dp),
-						color = Color.White
-					)
-
-					Row(
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
-					) {
-						Slider(
-							value = zoomRatio.collectAsState().value,
-							onValueChange = { zoomRatio.value = it },
-							valueRange = 0f..1f,
-							modifier = Modifier.weight(1f)
-						)
-						Button(
-							modifier = Modifier.wrapContentWidth(),
-							onClick = { isFlashEnabled.value = !isFlashEnabled.value }
-						) {
-							Text("Toggle Flash")
-						}
-					}
-				}
-			}
+			ComposeScannerScreen(
+				scannerCallback = scannerCallback,
+				decodingState = decodingState.collectAsStateWithLifecycle(),
+				isFlashEnabled = isFlashEnabled.collectAsStateWithLifecycle(),
+				zoomRatio = zoomRatio.collectAsStateWithLifecycle(),
+				onFlashToggled = { isFlashEnabled.value = it },
+				onZoomRatioChanged = { zoomRatio.value = it },
+			)
 		}
 	}
 
